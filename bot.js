@@ -13,6 +13,7 @@ const vk = new VK({
 
 const userStates = new Map();
 
+//TODO: Переделать нахуй?
 const commandsMap = {
     'Расписание': 'schedule',
     'Учителя': 'teachers',
@@ -41,8 +42,8 @@ async function executeCommand(commandLabel, context) {
             await context.send('Произошла ошибка при выполнении команды.');
         }
     } else {
-        console.log(`Команда не найдена: ${commandFile}`);
-        await context.send('Команда не найдена.');
+        console.log(`Модуль недоступен: ${commandFile}`);
+        await context.send(`Ошибка ¯\_(ツ)_/¯`);
     }
 }
 
@@ -64,6 +65,7 @@ async function handleBackCommand(context) {
     });
 }
 
+//TODO: Отправить в файл
 command.hear('Назад', handleBackCommand);
 
 vk.updates.on('message', async (context) => {
