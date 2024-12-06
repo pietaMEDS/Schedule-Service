@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const dotenv = require('dotenv');
+const teacherModule = require("./commands/teachers");
 dotenv.config();
 
 const vk = new VK({
@@ -84,6 +85,13 @@ vk.updates.on('message', async (context) => {
         await teacherModule.handleMessage(context, userStates);
         return;
     }
+
+    if (state && state.state === 'awaiting_location_number') {
+        const classroomsModule = require('./commands/classrooms.js');
+        await classroomsModule.handleMessage(context, userStates);
+        return;
+    }
+
 
     if (!state) {
         await executeCommand(text, context);

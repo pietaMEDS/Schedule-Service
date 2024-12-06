@@ -2,14 +2,15 @@ const mergeSchedules = (lessons, replacements) => {
     let mergedSchedules = [...lessons];
 
     replacements.forEach(replacement => {
-        const existingLesson = mergedSchedules.find(lesson => lesson.ordinal === replacement.ordinal && lesson.datOfWeek === replacement.datOfWeek);
+        replacement.dayOfWeek = replacement.datOfWeek;
+
+        const existingLesson = mergedSchedules.find(lesson =>
+            lesson.ordinal === replacement.ordinal &&
+            lesson.dayOfWeek === replacement.dayOfWeek
+        );
 
         if (existingLesson) {
-            Object.assign(existingLesson, {
-                ...replacement,
-                id: existingLesson.id
-
-            });
+            Object.assign(existingLesson, replacement);
         } else {
             mergedSchedules.push({
                 ...replacement,
