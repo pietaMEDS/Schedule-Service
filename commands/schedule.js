@@ -1,5 +1,6 @@
 const { handleGroupState, handleSubgroupState } = require('../utility/buttonSchedule');
-const { createBackButtonKeyboard } = require('../utility/button');
+const { createBackButtonKeyboard, createKeyboard } = require('../utility/button');
+const { formatScheduleMessage } = require('../utility/scheduleFormatter');
 
 const stateHandlers = {
     'awaiting_group': handleGroupState,
@@ -7,7 +8,7 @@ const stateHandlers = {
 };
 
 module.exports.execute = async (context, userStates) => {
-    userStates.set(context.peerId, 'awaiting_group');
+    userStates.set(context.peerId, { state: 'awaiting_group' });
 
     await context.send({
         message: 'Введите вашу группу',
@@ -16,13 +17,21 @@ module.exports.execute = async (context, userStates) => {
 };
 
 module.exports.handleMessage = async (context, userStates) => {
-    const state = userStates.get(context.peerId);
-    const handler = stateHandlers[state];
+    const userState = userStates.get(context.peerId);
+    const handler = stateHandlers[userState.state];
 
     if (handler) {
-        const isHandled = await handler(context, userStates);
-        if (isHandled) return;
-    }
+        const result = await handler(context, userStates);
 
-    await context.send('Неизвестное состояние или ошибка обработки.');
+        if (Array.isArray(result) && result.length > 0) {
+            console.log('Полученные данные от API:', result);
+
+            const scheduleMessage = formatScheduleMessage(result);
+
+            await context.send({
+                message: scheduleMessage,
+                keyboard: JSON.stringify(createKeyboard())
+            });
+        }
+    }
 };
