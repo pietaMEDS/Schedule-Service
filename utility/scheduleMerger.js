@@ -6,9 +6,8 @@ const mergeSchedules = (lessons, replacements) => {
 
         if (existingLesson) {
             Object.assign(existingLesson, {
-                subject: replacement.subject,
-                teacher: replacement.teacher,
-                location: replacement.location
+                ...replacement,
+                id: existingLesson.id
 
             });
         } else {

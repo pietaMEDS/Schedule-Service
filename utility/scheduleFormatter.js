@@ -1,4 +1,4 @@
-function formatScheduleMessage(data) {
+function formatScheduleMessage(data, includeGroup = false) {
     if (!data || !data.length) {
         return 'Расписание не найдено или ошибка в данных.';
     }
@@ -35,7 +35,13 @@ function formatScheduleMessage(data) {
 
         lessons.forEach((lesson) => {
             const ordinalEmoji = getOrdinalEmoji(lesson.ordinal);
-            scheduleMessage += `${ordinalEmoji} ${lesson.subject} 🎓${lesson.teacher} 🚪${lesson.location}\n`;
+            let lessonMessage = `${ordinalEmoji} ${lesson.subject} 🎓${lesson.teacher} 🚪${lesson.location} `;
+
+            if (includeGroup) {
+                lessonMessage += `- ${lesson.group.title}`;
+            }
+
+            scheduleMessage += lessonMessage + '\n';
         });
 
         scheduleMessage += '\n';
@@ -43,6 +49,7 @@ function formatScheduleMessage(data) {
 
     return scheduleMessage;
 }
+
 
 function getDaysToShow(currentDay) {
     switch (currentDay) {

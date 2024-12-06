@@ -24,9 +24,7 @@ module.exports.handleMessage = async (context, userStates) => {
         const result = await handler(context, userStates);
 
         if (Array.isArray(result) && result.length > 0) {
-            console.log('Полученные данные от API:', result);
-
-            const scheduleMessage = formatScheduleMessage(result);
+            const scheduleMessage = formatScheduleMessage(result, false);
 
             await context.send({
                 message: scheduleMessage,

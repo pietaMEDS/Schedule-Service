@@ -79,8 +79,13 @@ vk.updates.on('message', async (context) => {
         return;
     }
 
+    if (state && state.state === 'awaiting_teacher_name') {
+        const teacherModule = require('./commands/teachers.js');
+        await teacherModule.handleMessage(context, userStates);
+        return;
+    }
+
     if (!state) {
-        const text = context.text.trim();
         await executeCommand(text, context);
     } else {
         const commandFile = commandsMap['Расписание'];
