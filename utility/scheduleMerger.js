@@ -3,6 +3,7 @@ const mergeSchedules = (lessons, replacements) => {
 
     replacements.forEach(replacement => {
         replacement.dayOfWeek = replacement.datOfWeek;
+        replacement.isReplacement = true;
 
         const existingLesson = mergedSchedules.find(lesson =>
             lesson.ordinal === replacement.ordinal &&

@@ -51,12 +51,20 @@ function formatScheduleMessage(data, includeGroup = false) {
 
                 if (lesson.subject === '------------') {
                     lessonMessage = `${ordinalEmoji} ❌ Пара отменена`;
+                }
+                else if (lesson.subject.includes('(Сам.раб)')) {
+                    lessonMessage = `${ordinalEmoji} ${lesson.subject}`;
                 } else {
-                    if (lesson.subject.includes('(Сам.раб)')) {
-                        lessonMessage = `${ordinalEmoji} ${lesson.subject}`;
-                    } else {
-                        lessonMessage = `${ordinalEmoji} ${lesson.subject} 🎓${lesson.teacher} 🚪${lesson.location}`;
+                    lessonMessage = `${ordinalEmoji}`;
+
+                    const isPencilReplacement = lesson.isReplacement === true;
+                    if (isPencilReplacement) {
+                        lessonMessage += ' ✏️';
                     }
+
+                    lessonMessage += ` ${lesson.subject}`;
+
+                    lessonMessage += ` 🎓${lesson.teacher} 🚪${lesson.location}`;
 
                     if (includeGroup) {
                         lessonMessage += ` - ${lesson.group.title}`;
