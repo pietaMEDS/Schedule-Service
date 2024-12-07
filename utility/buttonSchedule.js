@@ -33,11 +33,12 @@ const handleSubgroupState = async (context, userStates) => {
     var month = new Date().getMonth();
     var today = new Date(year, month, 0).getTime();
     var now = new Date().getTime();
+    var DayOfWeek = new Date().getDay()
     var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
     if (week % 2) {
-        week_type = 1;
-    } else {
         week_type = 2;
+    } else {
+        week_type = 1;
     }
 
 
@@ -53,20 +54,58 @@ const handleSubgroupState = async (context, userStates) => {
         userStates.delete(context.peerId);
 
         try {
-            const lessonsResponse = await axios.get('http://localhost:9000/api/lessons', {
-                params: { groupName, subgroup: subgroupNumber, odd: week_type }
-            });
+            if (DayOfWeek === 6) {
 
-            const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
-                params: { groupName, subgroup: subgroupNumber }
-            });
+                let SaturdayResponse = await axios.get('http://localhost:9000/api/lessons', {
+                    params: { groupName, subgroup: subgroupNumber, odd: week_type }
+                });
 
-            const lessons = lessonsResponse.data;
-            const replacements = replacementResponse.data;
+                let saturdayReplacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                    params: { groupName, subgroup: subgroupNumber }
+                });
 
-            const updatedSchedule = mergeSchedules(lessons, replacements);
+                const SaturdayReplacementResponse = saturdayReplacementResponse.data.filter(replacement => replacement.dayOfWeek === "SATURDAY");
+                const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
-            return updatedSchedule;
+                const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
+
+
+                if (week % 2) {
+                    week_type = 1;
+                } else {
+                    week_type = 2;
+                }
+                
+                const lessonsResponse = await axios.get('http://localhost:9000/api/lessons', {
+                    params: { groupName, subgroup: subgroupNumber, odd: week_type }
+                });
+
+                const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                    params: { groupName, subgroup: subgroupNumber }
+                });
+
+                let updatedSchedule = mergeSchedules(lessonsResponse.data, replacementResponse.data);
+                
+                updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
+                
+                const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
+                return finalSchedule;
+
+            } else {
+                const lessonsResponse = await axios.get('http://localhost:9000/api/lessons', {
+                    params: { groupName, subgroup: subgroupNumber, odd: week_type }
+                });
+
+                const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                    params: { groupName, subgroup: subgroupNumber }
+                });
+
+                const lessons = lessonsResponse.data;
+                const replacements = replacementResponse.data;
+
+                const updatedSchedule = mergeSchedules(lessons, replacements);
+                return updatedSchedule;
+            }
         } catch (error) {
             console.error('Ошибка при запросе к API:', error);
 
