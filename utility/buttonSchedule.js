@@ -64,10 +64,11 @@ const handleSubgroupState = async (context, userStates) => {
                     params: { groupName, subgroup: subgroupNumber }
                 });
 
-                const SaturdayReplacementResponse = saturdayReplacementResponse.data.filter(replacement => replacement.dayOfWeek === "SATURDAY");
+                const SaturdayReplacementResponse = saturdayReplacementResponse.data.filter(replacement => replacement.datOfWeek === "SATURDAY");
                 const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
                 const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
+                console.log(saturdaySchedule);
 
 
                 if (week % 2) {
