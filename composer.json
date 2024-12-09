@@ -1,0 +1,15 @@
+{
+    "name": "scheduleteam/schedule-service",
+    "autoload": {
+        "psr-4": {
+            "Scheduleteam\\ScheduleService\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "nafana123",
+            "email": "makartop08@mail.ru"
+        }
+    ],
+    "require": {}
+}
