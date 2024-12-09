@@ -13,6 +13,7 @@ function formatScheduleMessage(data, includeGroup = false) {
         'SUNDAY': 'Воскресенье'
     };
 
+    const daysOrder = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
     const today = new Date();
     const currentDay = today.getDay();
 
@@ -30,26 +31,47 @@ function formatScheduleMessage(data, includeGroup = false) {
     }, {});
 
     let scheduleMessage = '';
-    for (const [day, lessons] of Object.entries(groupedSchedule)) {
-        scheduleMessage += `${daysOfWeek[day]}\n`;
 
-        lessons.forEach((lesson) => {
-            const ordinalEmoji = getOrdinalEmoji(lesson.ordinal);
-            let lessonMessage = `${ordinalEmoji} ${lesson.subject} 🎓${lesson.teacher} 🚪${lesson.location} `;
+    if (currentDay === 6) {
+        const reorderedDays = ['SATURDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY'];
+        const otherDays = ['THURSDAY', 'FRIDAY'];
 
-            if (includeGroup) {
-                lessonMessage += `- ${lesson.group.title}`;
-            }
-
-            scheduleMessage += lessonMessage + '\n';
-        });
-
-        scheduleMessage += '\n';
+        daysOrder.length = 0;
+        daysOrder.push(...reorderedDays, ...otherDays);
     }
+
+    daysOrder.forEach(day => {
+        if (groupedSchedule[day]) {
+            groupedSchedule[day].sort((a, b) => a.ordinal - b.ordinal);
+            scheduleMessage += `${daysOfWeek[day]}\n`;
+
+            groupedSchedule[day].forEach((lesson) => {
+                const ordinalEmoji = getOrdinalEmoji(lesson.ordinal);
+                let lessonMessage = '';
+
+                if (lesson.subject === '------------') {
+                    lessonMessage = `${ordinalEmoji} ❌ Пара отменена`;
+                } else {
+                    if (lesson.subject.includes('(Сам.раб)')) {
+                        lessonMessage = `${ordinalEmoji} ${lesson.subject}`;
+                    } else {
+                        lessonMessage = `${ordinalEmoji} ${lesson.subject} 🎓${lesson.teacher} 🚪${lesson.location}`;
+                    }
+
+                    if (includeGroup) {
+                        lessonMessage += ` - ${lesson.group.title}`;
+                    }
+                }
+
+                scheduleMessage += lessonMessage + '\n';
+            });
+
+            scheduleMessage += '\n';
+        }
+    });
 
     return scheduleMessage;
 }
-
 
 function getDaysToShow(currentDay) {
     switch (currentDay) {
@@ -60,7 +82,7 @@ function getDaysToShow(currentDay) {
         case 2:
             return ['TUESDAY', 'WEDNESDAY'];
         case 3:
-            return ['WEDNESDAY'];
+            return ['WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
         case 4:
             return ['THURSDAY', 'FRIDAY', 'SATURDAY'];
         case 5:

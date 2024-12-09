@@ -39,9 +39,7 @@ module.exports.handleMessage = async (context, userStates) => {
                 params: { odd: week_type }
             });
 
-            const replacementsResponse = await axios.get('http://localhost:9000/api/teachers/' + encodeURIComponent(teacherName) + '/replacements', {
-                params: { odd: week_type }
-            });
+            const replacementsResponse = await axios.get('http://localhost:9000/api/teachers/' + encodeURIComponent(teacherName) + '/replacements');
 
             const lessons = lessonsResponse.data;
             const replacements = replacementsResponse.data;

@@ -19,6 +19,8 @@ const mergeSchedules = (lessons, replacements) => {
         }
     });
 
+    mergedSchedules.sort((a, b) => a.ordinal - b.ordinal);
+
     return mergedSchedules;
 };
 

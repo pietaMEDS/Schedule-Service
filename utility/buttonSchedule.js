@@ -58,7 +58,7 @@ const handleSubgroupState = async (context, userStates) => {
             });
 
             const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
-                params: { groupName, subgroup: subgroupNumber, odd: week_type }
+                params: { groupName, subgroup: subgroupNumber }
             });
 
             const lessons = lessonsResponse.data;
