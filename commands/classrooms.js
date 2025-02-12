@@ -2,6 +2,9 @@ const axios = require('axios');
 const { createBackButtonKeyboard, createKeyboard } = require('../utility/button');
 const { formatScheduleMessage } = require('../utility/scheduleFormatter');
 const mergeSchedules = require('../utility/scheduleMerger');
+require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 module.exports.execute = async (context, userStates) => {
     userStates.set(context.peerId, { state: 'awaiting_location_number' });
@@ -37,11 +40,11 @@ module.exports.handleMessage = async (context, userStates) => {
 
         if (DayOfWeek === 6) {
 
-            let SaturdayResponse = await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/lessons`, {
+            let SaturdayResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/lessons`, {
                 params: { odd: week_type }
         });
 
-            let saturdayReplacementResponse =  await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/replacements`);
+            let saturdayReplacementResponse =  await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/replacements`);
 
             const SaturdayReplacementResponse = saturdayReplacementResponse.data.filter(replacement => replacement.datOfWeek === "SATURDAY");
             const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
@@ -54,11 +57,11 @@ module.exports.handleMessage = async (context, userStates) => {
                 week_type = 2;
             }
 
-            const lessonsResponse = await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/lessons`, {
+            const lessonsResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/lessons`, {
                 params: { odd: week_type }
             });
 
-            const replacementResponse = await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/replacements`);
+            const replacementResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/replacements`);
 
 
             let updatedSchedule = mergeSchedules(lessonsResponse.data, replacementResponse.data);
@@ -75,11 +78,11 @@ module.exports.handleMessage = async (context, userStates) => {
             });
         }
         else{
-            const lessonsResponse = await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/lessons`, {
+            const lessonsResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/lessons`, {
                 params: { odd: week_type }
             });
 
-            const replacementsResponse = await axios.get(`http://localhost:9000/api/locations/${encodeURIComponent(locationNumber)}/replacements`);
+            const replacementsResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/replacements`);
 
             const lessons = lessonsResponse.data;
             const replacements = replacementsResponse.data;
