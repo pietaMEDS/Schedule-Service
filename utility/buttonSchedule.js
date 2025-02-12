@@ -1,6 +1,9 @@
 const axios = require('axios');
 const { createBackButtonKeyboard, createGroupKeyboard, createKeyboard } = require('../utility/button');
 const mergeSchedules = require('../utility/scheduleMerger');
+require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const handleGroupState = async (context, userStates) => {
     const group = context.text.trim();
@@ -56,11 +59,11 @@ const handleSubgroupState = async (context, userStates) => {
         try {
             if (DayOfWeek === 6) {
 
-                let SaturdayResponse = await axios.get('http://localhost:9000/api/lessons', {
+                let SaturdayResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
 
-                let saturdayReplacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                let saturdayReplacementResponse = await axios.get(`${process.env.HOST}/replacement`, {
                     params: { groupName, subgroup: subgroupNumber }
                 });
 
@@ -77,11 +80,11 @@ const handleSubgroupState = async (context, userStates) => {
                     week_type = 2;
                 }
                 
-                const lessonsResponse = await axios.get('http://localhost:9000/api/lessons', {
+                const lessonsResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
 
-                const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                const replacementResponse = await axios.get(`${process.env.HOST}/replacement`, {
                     params: { groupName, subgroup: subgroupNumber }
                 });
 
@@ -93,11 +96,11 @@ const handleSubgroupState = async (context, userStates) => {
                 return finalSchedule;
 
             } else {
-                const lessonsResponse = await axios.get('http://localhost:9000/api/lessons', {
+                const lessonsResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
 
-                const replacementResponse = await axios.get('http://localhost:9000/api/replacement', {
+                const replacementResponse = await axios.get(`${process.env.HOST}/replacement`, {
                     params: { groupName, subgroup: subgroupNumber }
                 });
 
