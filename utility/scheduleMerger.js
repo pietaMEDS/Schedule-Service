@@ -1,5 +1,6 @@
 const mergeSchedules = (lessons, replacements) => {
     let mergedSchedules = [...lessons];
+    console.log(mergedSchedules);
 
     replacements.forEach(replacement => {
         replacement.dayOfWeek = replacement.datOfWeek;

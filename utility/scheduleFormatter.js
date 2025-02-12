@@ -68,9 +68,9 @@ function formatScheduleMessage(data, includeGroup = false) {
 
                     if (includeGroup) {
                         lessonMessage += ` - ${lesson.group.title}`;
-                    }
-                    if (lesson.subgroup !== 0) {
-                        lessonMessage += ` (${lesson.subgroup})`;
+                        if (lesson.subgroup !== 0) {
+                            lessonMessage += ` (${lesson.subgroup})`;
+                        }
                     }
                 }
 

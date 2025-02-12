@@ -11,7 +11,7 @@ module.exports.execute = async (context, userStates) => {
     userStates.set(context.peerId, { state: 'awaiting_group' });
 
     await context.send({
-        message: 'Введите вашу группу',
+        message: 'Введите вашу группу, пример: Испвк-21-1',
         keyboard: JSON.stringify(createBackButtonKeyboard())
     });
 };

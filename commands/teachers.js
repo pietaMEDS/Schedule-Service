@@ -82,7 +82,6 @@ module.exports.handleMessage = async (context, userStates) => {
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
             const scheduleMessage = formatScheduleMessage(finalSchedule, true);
 
-            console.log(finalSchedule)
             await context.send({
                 message: scheduleMessage,
                 keyboard: JSON.stringify(createKeyboard())

@@ -10,12 +10,21 @@ module.exports.execute = async (context, userStates) => {
     userStates.set(context.peerId, { state: 'awaiting_location_number' });
 
     await context.send({
-        message: 'Введите номер кабинета:',
+        message: 'Введите номер кабинета, пример: А407',
         keyboard: JSON.stringify(createBackButtonKeyboard())
     });
 };
 
 module.exports.handleMessage = async (context, userStates) => {
+    if (context.text === 'Назад') {
+        userStates.delete(context.peerId);
+        await context.send({
+            message: 'Вы вернулись в главное меню. Выберите команду.',
+            keyboard: JSON.stringify(createKeyboard())
+        });
+        return true;
+    }
+
     const userId = context.peerId;
     const state = userStates.get(userId);
 
@@ -71,7 +80,6 @@ module.exports.handleMessage = async (context, userStates) => {
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
             const scheduleMessage = formatScheduleMessage(finalSchedule, true);
 
-            console.log(finalSchedule)
             await context.send({
                 message: scheduleMessage,
                 keyboard: JSON.stringify(createKeyboard())
