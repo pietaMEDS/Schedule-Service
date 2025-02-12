@@ -13,6 +13,16 @@ module.exports.execute = async (context, userStates) => {
 };
 
 module.exports.handleMessage = async (context, userStates) => {
+
+    if (context.text === 'Назад') {
+        userStates.delete(context.peerId);
+        await context.send({
+            message: 'Вы вернулись в главное меню. Выберите команду.',
+            keyboard: JSON.stringify(createKeyboard())
+        });
+        return true;
+    }
+
     const userId = context.peerId;
     const state = userStates.get(userId);
 
