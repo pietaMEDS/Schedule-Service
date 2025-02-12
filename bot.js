@@ -17,7 +17,7 @@ const userStates = new Map();
 const commandsMap = {
     'Расписание': 'schedule',
     'Учителя': 'teachers',
-    'Кабинеты': 'classrooms'
+    'Кабинеты': 'classrooms',
 };
 
 const command = new HearManager();
@@ -75,7 +75,7 @@ vk.updates.on('message', async (context) => {
 
     const state = userStates.get(context.peerId);
 
-    if (text === '/start') {
+    if (text === 'Начать' || text === "Назад") {
         await handleStartCommand(context);
         return;
     }

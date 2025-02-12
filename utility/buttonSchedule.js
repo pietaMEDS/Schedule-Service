@@ -122,15 +122,6 @@ const handleSubgroupState = async (context, userStates) => {
         }
     }
 
-    if (subgroup === 'Назад') {
-        userStates.set(context.peerId, { state: 'awaiting_group' });
-        await context.send({
-            message: 'Вы вернулись назад. Введите вашу группу:',
-            keyboard: JSON.stringify(createBackButtonKeyboard())
-        });
-        return true;
-    }
-
     await context.send('Пожалуйста, выберите подгруппу.');
     return false;
 };

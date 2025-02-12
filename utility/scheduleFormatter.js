@@ -65,15 +65,14 @@ function formatScheduleMessage(data, includeGroup = false) {
                     lessonMessage += ` ${lesson.subject}`;
 
                     lessonMessage += ` 🎓${lesson.teacher} 🚪${lesson.location}`;
-                    
-                    lessonMessage += ` ${getOrdinalTime(lesson.ordinal)} `;
 
                     if (includeGroup) {
                         lessonMessage += ` - ${lesson.group.title}`;
                         if (lesson.subgroup !== 0) {
                             lessonMessage += ` (${lesson.subgroup})`;
                         }
-                    }
+                    } 
+                    lessonMessage += ` ${getOrdinalTime(lesson.ordinal)} `;
                 }
 
                 scheduleMessage += lessonMessage + '\n';
