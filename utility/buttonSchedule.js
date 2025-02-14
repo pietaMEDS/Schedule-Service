@@ -114,7 +114,7 @@ const handleSubgroupState = async (context, userStates) => {
             console.error('Ошибка при запросе к API:', error);
 
             await context.send({
-                message: 'Произошла ошибка при получении данных. Попробуйте снова.',
+                message: 'Произошла ошибка при получении данных.\nОбычно такое происходит при технических работах\nПопробуйте позже.',
                 keyboard: JSON.stringify(createKeyboard())
             });
 
