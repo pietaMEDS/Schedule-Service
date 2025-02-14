@@ -38,7 +38,7 @@ module.exports.handleMessage = async (context, userStates) => {
     var DayOfWeek = new Date().getDay()
 
     var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
-    if (week % 2) {
+    if ( ((week % 2 ) == 0 )) {
         week_type = 2;
     } else {
         week_type = 1;
@@ -48,6 +48,13 @@ module.exports.handleMessage = async (context, userStates) => {
         const teacherName = context.text.trim();
 
         userStates.set(userId, { state: 'awaiting_schedule' });
+
+        console.log(`Day = ${DayOfWeek}`);
+        console.log(`Week_type = ${week_type}`);
+        console.log(`get_week_is = ${weekCount(year, month )}`);
+        console.log(`try something = ${(week % 2 ) == 0}`);
+        
+        
 
         if (DayOfWeek === 6) {
 
@@ -62,7 +69,7 @@ module.exports.handleMessage = async (context, userStates) => {
 
             const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
 
-            if (week % 2) {
+            if ((week % 2 ) == 0) {
                 week_type = 1;
             } else {
                 week_type = 2;
@@ -92,6 +99,7 @@ module.exports.handleMessage = async (context, userStates) => {
                 params: { odd: week_type }
             });
 
+            
             const replacementsResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/replacements');
 
             const lessons = lessonsResponse.data;

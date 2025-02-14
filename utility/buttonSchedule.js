@@ -38,7 +38,7 @@ const handleSubgroupState = async (context, userStates) => {
     var now = new Date().getTime();
     var DayOfWeek = new Date().getDay()
     var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
-    if (week % 2) {
+    if ((week % 2 ) == 0) {
         week_type = 2;
     } else {
         week_type = 1;
@@ -74,7 +74,7 @@ const handleSubgroupState = async (context, userStates) => {
                 console.log(saturdaySchedule);
 
 
-                if (week % 2) {
+                if ((week % 2 ) == 0) {
                     week_type = 1;
                 } else {
                     week_type = 2;
