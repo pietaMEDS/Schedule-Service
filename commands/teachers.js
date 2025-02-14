@@ -51,7 +51,6 @@ module.exports.handleMessage = async (context, userStates) => {
 
         console.log(`Day = ${DayOfWeek}`);
         console.log(`Week_type = ${week_type}`);
-        console.log(`get_week_is = ${weekCount(year, month )}`);
         console.log(`try something = ${(week % 2 ) == 0}`);
         
         
@@ -119,6 +118,8 @@ module.exports.handleMessage = async (context, userStates) => {
             } else {
                 await context.send('Не найдено расписание или замены для этого учителя.\nОбычно такое происходит при технических работах\nПопробуйте позже.');
             }
+
+            console.log(replacementsResponse);
 
             userStates.delete(userId);
         }
