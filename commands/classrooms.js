@@ -105,7 +105,7 @@ module.exports.handleMessage = async (context, userStates) => {
                     keyboard: JSON.stringify(createKeyboard())
                 });
             } else {
-                await context.send('Не найдено расписание или замены для этого кабинета.');
+                await context.send('Не найдено расписание или замены для этого кабинета. \nОбычно такое происходит при технических работах\nПопробуйте позже.');
             }
 
             userStates.delete(userId);

@@ -1,6 +1,6 @@
 function formatScheduleMessage(data, includeGroup = false) {
     if (!data || !data.length) {
-        return 'Расписание не найдено или ошибка в данных.';
+        return 'Расписание не найдено или ошибка в данных.\nОбычно такое происходит при технических работах\nПопробуйте позже.';
     }
 
     const daysOfWeek = {
