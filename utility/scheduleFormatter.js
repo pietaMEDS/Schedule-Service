@@ -72,7 +72,7 @@ function formatScheduleMessage(data, includeGroup = false) {
                             lessonMessage += ` (${lesson.subgroup})`;
                         }
                     } 
-                    lessonMessage += ` ${getOrdinalTime(lesson.ordinal)} `;
+                    lessonMessage +=  ` ${day === "SATURDAY" ? getSaturdayTime(lesson.ordinal) : getOrdinalTime(lesson.ordinal)}` ;                  
                 }
 
                 scheduleMessage += lessonMessage + '\n';
@@ -123,13 +123,27 @@ function getOrdinalEmoji(ordinal) {
 
 function getOrdinalTime(ordinal) {
     const TimeMap = {
+        1: '🕣08:30-10:00',
+        2: '🕙10:10-11:40',
+        3: '🕧12:20-13:50',
+        4: '🕝14:20-15:50',
+        5: '🕓16:00-17:30',
+        6: '🕠17:40-19:10',
+        7: '🕢19:20-20:50',
+    };
+
+    return TimeMap[ordinal];
+}
+
+function getSaturdayTime(ordinal) {
+    const TimeMap = {
         1: '🕣 08:30-10:00',
         2: '🕙 10:10-11:40',
-        3: '🕧 12:20-13:50',
-        4: '🕝 14:20-15:50',
-        5: '🕓 16:00-17:30',
-        6: '🕠 17:40-19:10',
-        7: '🕢 19:20-20:50',
+        3: '🕧 11:50-13:20',
+        4: '🕝 13:30-15:00',
+        5: '🕓 15:10-16:40',
+        6: '🕠 16:50-18:20',
+        7: '🕢 18:30-20:00',
     };
 
     return TimeMap[ordinal];

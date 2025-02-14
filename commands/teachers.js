@@ -119,8 +119,6 @@ module.exports.handleMessage = async (context, userStates) => {
                 await context.send('Не найдено расписание или замены для этого учителя.\nОбычно такое происходит при технических работах\nПопробуйте позже.');
             }
 
-            console.log(replacementsResponse);
-
             userStates.delete(userId);
         }
     }
