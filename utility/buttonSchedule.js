@@ -38,7 +38,7 @@ const handleSubgroupState = async (context, userStates) => {
     var now = new Date().getTime();
     var DayOfWeek = new Date().getDay()
     var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
-    if ((week % 2 ) == 0) {
+    if ((week % 2 ) === 0) {
         week_type = 2;
     } else {
         week_type = 1;
@@ -71,7 +71,6 @@ const handleSubgroupState = async (context, userStates) => {
                 const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
                 const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
-                console.log(saturdaySchedule);
 
 
                 if ((week % 2 ) == 0) {
@@ -79,7 +78,7 @@ const handleSubgroupState = async (context, userStates) => {
                 } else {
                     week_type = 2;
                 }
-                
+
                 const lessonsResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });

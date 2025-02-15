@@ -52,8 +52,8 @@ module.exports.handleMessage = async (context, userStates) => {
         console.log(`Day = ${DayOfWeek}`);
         console.log(`Week_type = ${week_type}`);
         console.log(`try something = ${(week % 2 ) == 0}`);
-        
-        
+
+
 
         if (DayOfWeek === 6) {
 
@@ -92,13 +92,14 @@ module.exports.handleMessage = async (context, userStates) => {
                 message: scheduleMessage,
                 keyboard: JSON.stringify(createKeyboard())
             });
+            return true
         }
         else{
             const lessonsResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/lessons', {
                 params: { odd: week_type }
             });
 
-            
+
             const replacementsResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/replacements');
 
             const lessons = lessonsResponse.data;
@@ -120,6 +121,8 @@ module.exports.handleMessage = async (context, userStates) => {
             }
 
             userStates.delete(userId);
+            return true
+
         }
     }
 };

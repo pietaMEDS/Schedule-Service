@@ -1,11 +1,13 @@
-const { VK } = require('vk-io');
-const { HearManager } = require('@vk-io/hear');
-const { createKeyboard } = require('./utility/button');
+const {VK} = require('vk-io');
+const {HearManager} = require('@vk-io/hear');
+const {createKeyboard} = require('./utility/button');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 const dotenv = require('dotenv');
 const teacherModule = require("./commands/teachers");
+const classroomsModule = require("./commands/classrooms");
+const sheduleModel = require("./commands/schedule")
 dotenv.config();
 
 const vk = new VK({
@@ -71,39 +73,44 @@ vk.updates.on('message', async (context) => {
     if (context.senderId === vk.id || context.isOutbox) {
         return;
     }
-    const text = context.text.trim();
+    const text = context.text?.trim();
 
     const state = userStates.get(context.peerId);
 
-    if (text === 'Начать' || text === "Назад") {
+    if (text === 'Начать' || text === "Назад" || text === "/start") {
         await handleStartCommand(context);
         return;
     }
 
-    if (state && state.state === 'awaiting_teacher_name') {
-        const teacherModule = require('./commands/teachers.js');
-        await teacherModule.handleMessage(context, userStates);
-        return;
-    }
-
-    if (state && state.state === 'awaiting_location_number') {
-        const classroomsModule = require('./commands/classrooms.js');
-        await classroomsModule.handleMessage(context, userStates);
-        return;
-    }
-
-
-    if (!state) {
-        await executeCommand(text, context);
-    } else {
-        const commandFile = commandsMap['Расписание'];
-        if (commandFile) {
-            const scheduleModule = require(`./commands/${commandFile}.js`);
-            if (scheduleModule.handleMessage) {
-                await scheduleModule.handleMessage(context, userStates);
-            }
+    if (state) {
+        if (state.state === 'awaiting_teacher_name') {
+            await teacherModule.handleMessage(context, userStates);
+            return;
         }
+
+
+        if (state.state === 'awaiting_location_number') {
+            await classroomsModule.handleMessage(context, userStates);
+            return;
+        }
+
+        if (state.state === 'awaiting_group') {
+            await sheduleModel.handleMessage(context, userStates);
+            return;
+
+        }
+        if (state.state === 'awaiting_subgroup') {
+            await sheduleModel.handleMessage(context, userStates);
+            return;
+
+        }
+
+        await executeCommand(text, context);
+
+    } else {
+        await executeCommand(text, context);
     }
+
 });
 
 vk.updates.start()
