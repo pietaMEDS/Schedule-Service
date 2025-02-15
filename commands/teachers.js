@@ -86,7 +86,7 @@ module.exports.handleMessage = async (context, userStates) => {
             updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
 
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
-            const scheduleMessage = formatScheduleMessage(finalSchedule, true);
+            const scheduleMessage = formatScheduleMessage(finalSchedule, 'teacher');
 
             await context.send({
                 message: scheduleMessage,
@@ -110,7 +110,7 @@ module.exports.handleMessage = async (context, userStates) => {
 
 
             if (updatedSchedule && updatedSchedule.length > 0) {
-                const scheduleMessage = formatScheduleMessage(updatedSchedule, true);
+                const scheduleMessage = formatScheduleMessage(updatedSchedule, 'teacher');
 
                 await context.send({
                     message: scheduleMessage,

@@ -1,4 +1,4 @@
-function formatScheduleMessage(data, includeGroup = false) {
+function formatScheduleMessage(data, type) {
     if (!data || !data.length) {
         return 'Расписание не найдено или ошибка в данных.\nОбычно такое происходит при технических работах\nПопробуйте позже.';
     }
@@ -43,9 +43,22 @@ function formatScheduleMessage(data, includeGroup = false) {
     daysOrder.forEach(day => {
         if (groupedSchedule[day]) {
             groupedSchedule[day].sort((a, b) => a.ordinal - b.ordinal);
-            scheduleMessage += `${daysOfWeek[day]}\n`;
+
+            const dayDate = getNextDayDate(today, day);
+
+            if(type === 'teacher'){
+                scheduleMessage += `Расписание для преподователя ${groupedSchedule[day][0].teacher} \n${daysOfWeek[day]} ${dayDate.toLocaleDateString('ru-RU')}:\n`;
+
+            }
+            else if(type === 'classrooms'){
+                scheduleMessage += `Расписание для кабинета ${groupedSchedule[day][0].location} \n${daysOfWeek[day]} ${dayDate.toLocaleDateString('ru-RU')}:\n`;
+            }
+            else {
+                scheduleMessage += `Расписание для группы ${groupedSchedule[day][0].group.title} \n${daysOfWeek[day]} ${dayDate.toLocaleDateString('ru-RU')}:\n`;
+            }
 
             groupedSchedule[day].forEach((lesson) => {
+
                 const ordinalEmoji = getOrdinalEmoji(lesson.ordinal);
                 let lessonMessage = '';
 
@@ -66,7 +79,7 @@ function formatScheduleMessage(data, includeGroup = false) {
 
                     lessonMessage += ` 🎓${lesson.teacher} 🚪${lesson.location}`;
 
-                    if (includeGroup) {
+                    if (type === 'teacher' || type === 'classrooms') {
                         lessonMessage += ` - ${lesson.group.title}`;
                         if (lesson.subgroup !== 0) {
                             lessonMessage += ` (${lesson.subgroup})`;
@@ -147,6 +160,22 @@ function getSaturdayTime(ordinal) {
     };
 
     return TimeMap[ordinal];
+}
+
+function getNextDayDate(today, day) {
+    const daysMap = {
+        'MONDAY': 1,
+        'TUESDAY': 2,
+        'WEDNESDAY': 3,
+        'THURSDAY': 4,
+        'FRIDAY': 5,
+        'SATURDAY': 6,
+        'SUNDAY': 0
+    };
+    const daysUntilNext = (daysMap[day] + 7 - today.getDay()) % 7;
+    const nextDay = new Date(today);
+    nextDay.setDate(today.getDate() + daysUntilNext);
+    return nextDay;
 }
 
 module.exports = { formatScheduleMessage };

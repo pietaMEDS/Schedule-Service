@@ -78,7 +78,7 @@ module.exports.handleMessage = async (context, userStates) => {
             updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
 
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
-            const scheduleMessage = formatScheduleMessage(finalSchedule, true);
+            const scheduleMessage = formatScheduleMessage(finalSchedule, 'classrooms');
 
             await context.send({
                 message: scheduleMessage,
@@ -98,7 +98,7 @@ module.exports.handleMessage = async (context, userStates) => {
             const updatedSchedule = mergeSchedules(lessons, replacements);
 
             if (updatedSchedule && updatedSchedule.length > 0) {
-                const scheduleMessage = formatScheduleMessage(updatedSchedule, false);
+                const scheduleMessage = formatScheduleMessage(updatedSchedule, 'classrooms');
 
                 await context.send({
                     message: scheduleMessage,
