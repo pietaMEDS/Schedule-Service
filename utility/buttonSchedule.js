@@ -1,9 +1,12 @@
 const axios = require('axios');
 const { createBackButtonKeyboard, createGroupKeyboard, createKeyboard } = require('../utility/button');
 const mergeSchedules = require('../utility/scheduleMerger');
+const { DateTime } = require('luxon');
 require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
+const { getNextMonday } = require('../utility/dateUtils');
+
 
 const handleGroupState = async (context, userStates) => {
     const group = context.text.trim();
@@ -25,25 +28,20 @@ const handleGroupState = async (context, userStates) => {
 
     return true;
 };
-
 const handleSubgroupState = async (context, userStates) => {
     const subgroup = context.text.trim();
     const userState = userStates.get(context.peerId);
     const { groupName } = userState;
     let week_type;
 
-    var year = new Date().getFullYear();
-    var month = new Date().getMonth();
-    var today = new Date(year, month, 0).getTime();
-    var now = new Date().getTime();
-    var DayOfWeek = new Date().getDay()
-    var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
-    if ((week % 2 ) === 0) {
-        week_type = 2;
-    } else {
-        week_type = 1;
-    }
+    const today = DateTime.now();
 
+    const mondayDate = getNextMonday(new Date(today));
+
+    const luxonMonday = DateTime.fromJSDate(mondayDate);
+    const week = luxonMonday.weekNumber;
+
+    week_type = (week % 2 === 0) ? 2 : 1;
 
     let subgroupNumber;
 
@@ -57,8 +55,7 @@ const handleSubgroupState = async (context, userStates) => {
         userStates.delete(context.peerId);
 
         try {
-            if (DayOfWeek === 6) {
-
+            if (mondayDate.weekday === 6) {
                 let SaturdayResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
@@ -72,13 +69,6 @@ const handleSubgroupState = async (context, userStates) => {
 
                 const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
 
-
-                if ((week % 2 ) == 0) {
-                    week_type = 1;
-                } else {
-                    week_type = 2;
-                }
-
                 const lessonsResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
@@ -88,9 +78,9 @@ const handleSubgroupState = async (context, userStates) => {
                 });
 
                 let updatedSchedule = mergeSchedules(lessonsResponse.data, replacementResponse.data);
-                
+
                 updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
-                
+
                 const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
                 return finalSchedule;
 

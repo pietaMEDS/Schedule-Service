@@ -5,6 +5,8 @@ const mergeSchedules = require('../utility/scheduleMerger');
 require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
+const { DateTime } = require('luxon');
+const { getNextMonday } = require('../utility/dateUtils');
 
 module.exports.execute = async (context, userStates) => {
     userStates.set(context.peerId, { state: 'awaiting_teacher_name' });
@@ -31,31 +33,25 @@ module.exports.handleMessage = async (context, userStates) => {
 
     let week_type;
 
-    var year = new Date().getFullYear();
-    var month = new Date().getMonth();
-    var today = new Date(year, month, 0).getTime();
-    var now = new Date().getTime();
-    var DayOfWeek = new Date().getDay()
+    const today = DateTime.now();
 
-    var week = Math.ceil((now - today) / (1000 * 60 * 60 * 24 * 7));
-    if ( ((week % 2 ) == 0 )) {
-        week_type = 2;
-    } else {
-        week_type = 1;
-    }
+    const mondayDate = getNextMonday(new Date(today));
+
+    const luxonMonday = DateTime.fromJSDate(mondayDate);
+    const week = luxonMonday.weekNumber;
+
+    week_type = (week % 2 === 0) ? 2 : 1;
+
 
     if (state && state.state === 'awaiting_teacher_name') {
         const teacherName = context.text.trim();
 
         userStates.set(userId, { state: 'awaiting_schedule' });
 
-        console.log(`Day = ${DayOfWeek}`);
-        console.log(`Week_type = ${week_type}`);
-        console.log(`try something = ${(week % 2 ) == 0}`);
+        console.log(`number week = ${week}`);
 
 
-
-        if (DayOfWeek === 6) {
+        if (mondayDate.weekday === 6) {
 
             let SaturdayResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/lessons', {
                 params: { odd: week_type }
@@ -67,12 +63,6 @@ module.exports.handleMessage = async (context, userStates) => {
             const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
             const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
-
-            if ((week % 2 ) == 0) {
-                week_type = 1;
-            } else {
-                week_type = 2;
-            }
 
             const lessonsResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/lessons', {
                 params: { odd: week_type }
