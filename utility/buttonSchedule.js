@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { createBackButtonKeyboard, createGroupKeyboard, createKeyboard } = require('../utility/button');
+const { createGroupKeyboard, createKeyboard } = require('../utility/button');
 const mergeSchedules = require('../utility/scheduleMerger');
 const { DateTime } = require('luxon');
 require('dotenv').config();
