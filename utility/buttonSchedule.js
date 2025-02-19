@@ -36,7 +36,6 @@ const handleSubgroupState = async (context, userStates) => {
     const today = DateTime.now();
     const  DayOfWeek = new Date().getDay()
 
-    // const mondayDate = getNextMonday(new Date(today));
 
     const luxonMonday = DateTime.fromJSDate(new Date(today));
     const week = luxonMonday.weekNumber;

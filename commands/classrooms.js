@@ -34,7 +34,6 @@ module.exports.handleMessage = async (context, userStates) => {
 
     const today = DateTime.now();
 
-    // const mondayDate = getNextMonday(new Date(today));
     const  DayOfWeek = new Date().getDay()
 
 

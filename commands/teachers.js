@@ -35,7 +35,6 @@ module.exports.handleMessage = async (context, userStates) => {
     const today = DateTime.now();
     const  DayOfWeek = new Date().getDay()
 
-    // const mondayDate = getNextMonday(new Date(today));
 
     const luxonMonday = DateTime.fromJSDate(new Date(today));
     const week = luxonMonday.weekNumber;
@@ -83,7 +82,7 @@ module.exports.handleMessage = async (context, userStates) => {
             updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
 
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
-            const scheduleMessage = formatScheduleMessage(finalSchedule, 'teacher');
+            const scheduleMessage = await formatScheduleMessage(finalSchedule, 'teacher');
 
             await context.send({
                 message: scheduleMessage,
@@ -107,7 +106,7 @@ module.exports.handleMessage = async (context, userStates) => {
 
 
             if (updatedSchedule && updatedSchedule.length > 0) {
-                const scheduleMessage = formatScheduleMessage(updatedSchedule, 'teacher');
+                const scheduleMessage = await formatScheduleMessage(updatedSchedule, 'teacher');
 
                 await context.send({
                     message: scheduleMessage,
