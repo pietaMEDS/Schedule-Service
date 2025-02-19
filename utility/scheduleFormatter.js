@@ -1,4 +1,6 @@
-function formatScheduleMessage(data, type) {
+const axios = require('axios');
+
+async function formatScheduleMessage(data, type) {
     if (!data || !data.length) {
         return 'Расписание не найдено или ошибка в данных.\nОбычно такое происходит при технических работах\nПопробуйте позже.';
     }
@@ -13,11 +15,20 @@ function formatScheduleMessage(data, type) {
         'SUNDAY': 'Воскресенье'
     };
 
-    const daysOrder = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+    let daysToShow
     const today = new Date();
     const currentDay = today.getDay();
+    const requestDate = getRequestDate(today, currentDay);
 
-    let daysToShow = getDaysToShow(currentDay);
+    const formattedRequestDate = formatDateForRequest(requestDate);
+    let existStatus = await checkReplacementExist(formattedRequestDate);
+    console.log('Дата замен:', formattedRequestDate, existStatus.status)
+    if(existStatus.status){
+        daysToShow = getDaysToShowExist(currentDay);
+    }
+    else {
+        daysToShow = getDaysToShow(currentDay);
+    }
 
     const groupedSchedule = data.reduce((acc, item) => {
         const day = item.dayOfWeek;
@@ -36,11 +47,11 @@ function formatScheduleMessage(data, type) {
         const reorderedDays = ['SATURDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY'];
         const otherDays = ['THURSDAY', 'FRIDAY'];
 
-        daysOrder.length = 0;
-        daysOrder.push(...reorderedDays, ...otherDays);
+        daysToShow.length = 0;
+        daysToShow.push(...reorderedDays, ...otherDays);
     }
 
-    daysOrder.forEach(day => {
+    daysToShow.forEach(day => {
         if (groupedSchedule[day]) {
             groupedSchedule[day].sort((a, b) => a.ordinal - b.ordinal);
 
@@ -84,8 +95,8 @@ function formatScheduleMessage(data, type) {
                         if (lesson.subgroup !== 0) {
                             lessonMessage += ` (${lesson.subgroup})`;
                         }
-                    } 
-                    lessonMessage +=  ` ${day === "SATURDAY" ? getSaturdayTime(lesson.ordinal) : getOrdinalTime(lesson.ordinal)}` ;                  
+                    }
+                    lessonMessage +=  ` ${day === "SATURDAY" ? getSaturdayTime(lesson.ordinal) : getOrdinalTime(lesson.ordinal)}` ;
                 }
 
                 scheduleMessage += lessonMessage + '\n';
@@ -97,21 +108,71 @@ function formatScheduleMessage(data, type) {
 
     return scheduleMessage;
 }
+async function checkReplacementExist(date) {
+    try {
+        const response = await axios.get(`${process.env.HOST}/replacementexist`, {
+            params: { date }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка при запросе замещений: ', error);
+        return { status: false };
+    }
+}
+
+function getRequestDate(today, currentDay) {
+    const daysMap = {
+        1: 'THURSDAY',
+        2: 'THURSDAY',
+        3: 'THURSDAY',
+        4: 'MONDAY',
+        5: 'MONDAY',
+        6: 'MONDAY',
+        0: 'MONDAY',
+    };
+    let requestedDay = daysMap[currentDay];
+    const requestedDate = getNextDayDate(today, requestedDay);
+    return requestedDate.toLocaleDateString('ru-RU');
+}
+function formatDateForRequest(dateString) {
+    const parts = dateString.split('.');
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+}
 
 function getDaysToShow(currentDay) {
     switch (currentDay) {
-        case 0:
-            return ['MONDAY', 'TUESDAY', 'WEDNESDAY'];
         case 1:
             return ['MONDAY', 'TUESDAY', 'WEDNESDAY'];
         case 2:
             return ['TUESDAY', 'WEDNESDAY'];
         case 3:
-            return ['WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+            return ['WEDNESDAY'];
         case 4:
             return ['THURSDAY', 'FRIDAY', 'SATURDAY'];
         case 5:
             return ['FRIDAY', 'SATURDAY'];
+        case 6:
+            return ['SATURDAY'];
+        case 0:
+            return ['SATURDAY'];
+        default:
+            return [];
+    }
+}
+function getDaysToShowExist(currentDay){
+    switch (currentDay) {
+        case 0:
+            return ['MONDAY', 'TUESDAY', 'WEDNESDAY',]
+        case 1:
+            return ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+        case 2:
+            return ['TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+        case 3:
+            return ['WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+        case 4:
+            return ['THURSDAY', 'FRIDAY', 'SATURDAY','MONDAY', 'TUESDAY', 'WEDNESDAY'];
+        case 5:
+            return ['FRIDAY', 'SATURDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY'];
         case 6:
             return ['SATURDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY'];
         default:

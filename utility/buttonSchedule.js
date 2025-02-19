@@ -1,11 +1,10 @@
 const axios = require('axios');
-const { createBackButtonKeyboard, createGroupKeyboard, createKeyboard } = require('../utility/button');
+const { createGroupKeyboard, createKeyboard } = require('../utility/button');
 const mergeSchedules = require('../utility/scheduleMerger');
 const { DateTime } = require('luxon');
 require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
-const { getNextMonday } = require('../utility/dateUtils');
 
 
 const handleGroupState = async (context, userStates) => {
@@ -35,13 +34,15 @@ const handleSubgroupState = async (context, userStates) => {
     let week_type;
 
     const today = DateTime.now();
+    const  DayOfWeek = new Date().getDay()
 
-    const mondayDate = getNextMonday(new Date(today));
+    // const mondayDate = getNextMonday(new Date(today));
 
-    const luxonMonday = DateTime.fromJSDate(mondayDate);
+    const luxonMonday = DateTime.fromJSDate(new Date(today));
     const week = luxonMonday.weekNumber;
 
     week_type = (week % 2 === 0) ? 2 : 1;
+    console.log(`number week = ${week}`);
 
     let subgroupNumber;
 
@@ -55,7 +56,8 @@ const handleSubgroupState = async (context, userStates) => {
         userStates.delete(context.peerId);
 
         try {
-            if (mondayDate.weekday === 6) {
+            if (DayOfWeek === 6 || DayOfWeek === 0 ) {
+                console.log('тест')
                 let SaturdayResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }
                 });
@@ -68,6 +70,13 @@ const handleSubgroupState = async (context, userStates) => {
                 const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
                 const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
+
+                if(week_type === 2){
+                    week_type = 1;
+                }
+                else{
+                    week_type = 2;
+                }
 
                 const lessonsResponse = await axios.get(`${process.env.HOST}/lessons`, {
                     params: { groupName, subgroup: subgroupNumber, odd: week_type }

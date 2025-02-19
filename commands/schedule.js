@@ -24,7 +24,7 @@ module.exports.handleMessage = async (context, userStates) => {
         const result = await handler(context, userStates);
 
         if (Array.isArray(result) && result.length > 0) {
-            const scheduleMessage = formatScheduleMessage(result, 'shedule');
+            const scheduleMessage = await formatScheduleMessage(result, 'shedule');
 
             await context.send({
                 message: scheduleMessage,

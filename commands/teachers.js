@@ -6,7 +6,6 @@ require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
 const { DateTime } = require('luxon');
-const { getNextMonday } = require('../utility/dateUtils');
 
 module.exports.execute = async (context, userStates) => {
     userStates.set(context.peerId, { state: 'awaiting_teacher_name' });
@@ -34,10 +33,11 @@ module.exports.handleMessage = async (context, userStates) => {
     let week_type;
 
     const today = DateTime.now();
+    const  DayOfWeek = new Date().getDay()
 
-    const mondayDate = getNextMonday(new Date(today));
+    // const mondayDate = getNextMonday(new Date(today));
 
-    const luxonMonday = DateTime.fromJSDate(mondayDate);
+    const luxonMonday = DateTime.fromJSDate(new Date(today));
     const week = luxonMonday.weekNumber;
 
     week_type = (week % 2 === 0) ? 2 : 1;
@@ -51,7 +51,7 @@ module.exports.handleMessage = async (context, userStates) => {
         console.log(`number week = ${week}`);
 
 
-        if (mondayDate.weekday === 6) {
+        if (DayOfWeek === 6 || DayOfWeek === 0 ) {
 
             let SaturdayResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/lessons', {
                 params: { odd: week_type }
@@ -63,6 +63,13 @@ module.exports.handleMessage = async (context, userStates) => {
             const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
             const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
+
+            if(week_type === 2){
+                week_type = 1;
+            }
+            else{
+                week_type = 2;
+            }
 
             const lessonsResponse = await axios.get(`${process.env.HOST}/teachers/` + encodeURIComponent(teacherName) + '/lessons', {
                 params: { odd: week_type }

@@ -6,7 +6,6 @@ require('dotenv').config();
 const dotenv = require('dotenv');
 dotenv.config();
 const { DateTime } = require('luxon');
-const { getNextMonday } = require('../utility/dateUtils');
 
 
 module.exports.execute = async (context, userStates) => {
@@ -35,9 +34,11 @@ module.exports.handleMessage = async (context, userStates) => {
 
     const today = DateTime.now();
 
-    const mondayDate = getNextMonday(new Date(today));
+    // const mondayDate = getNextMonday(new Date(today));
+    const  DayOfWeek = new Date().getDay()
 
-    const luxonMonday = DateTime.fromJSDate(mondayDate);
+
+    const luxonMonday = DateTime.fromJSDate(new Date(today));
     const week = luxonMonday.weekNumber;
 
     week_type = (week % 2 === 0) ? 2 : 1;
@@ -48,7 +49,7 @@ module.exports.handleMessage = async (context, userStates) => {
 
         userStates.set(userId, { state: 'awaiting_schedule_for_location' });
 
-        if (mondayDate.weekday === 6) {
+        if (DayOfWeek === 6 || DayOfWeek === 0 ) {
 
             let SaturdayResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/lessons`, {
                 params: { odd: week_type }
@@ -60,6 +61,13 @@ module.exports.handleMessage = async (context, userStates) => {
             const SaturdayLessons = SaturdayResponse.data.filter(lesson => lesson.dayOfWeek === "SATURDAY");
 
             const saturdaySchedule = mergeSchedules(SaturdayLessons, SaturdayReplacementResponse);
+
+            if(week_type === 2){
+                week_type = 1;
+            }
+            else{
+                week_type = 2;
+            }
 
             const lessonsResponse = await axios.get(`${process.env.HOST}/locations/${encodeURIComponent(locationNumber)}/lessons`, {
                 params: { odd: week_type }
@@ -73,7 +81,7 @@ module.exports.handleMessage = async (context, userStates) => {
             updatedSchedule = updatedSchedule.filter(lesson => lesson.dayOfWeek !== "SATURDAY");
 
             const finalSchedule = [...updatedSchedule, ...saturdaySchedule];
-            const scheduleMessage = formatScheduleMessage(finalSchedule, 'classrooms');
+            const scheduleMessage = await formatScheduleMessage(finalSchedule, 'classrooms');
 
             await context.send({
                 message: scheduleMessage,
@@ -93,7 +101,7 @@ module.exports.handleMessage = async (context, userStates) => {
             const updatedSchedule = mergeSchedules(lessons, replacements);
 
             if (updatedSchedule && updatedSchedule.length > 0) {
-                const scheduleMessage = formatScheduleMessage(updatedSchedule, 'classrooms');
+                const scheduleMessage = await formatScheduleMessage(updatedSchedule, 'classrooms');
 
                 await context.send({
                     message: scheduleMessage,
